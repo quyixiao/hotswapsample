@@ -17,6 +17,10 @@ import java.util.List;
  *
  * @author 563868273@qq.com
  * @version $Id: com.TestAgentBootstrap.java, v 0.1 2018-12-15 下午10:42 @yourMIS $$
+ *
+ *
+ *
+ *
  */
 public class TestAgentBootstrap {
     public static void premain(String agentArgs, Instrumentation inst) {
@@ -32,10 +36,11 @@ public class TestAgentBootstrap {
         //必须设置true，才能进行多次retrans
         inst.addTransformer(new SampleTransformer(), true);
         new Thread(() -> {
-            while (true) {
+            while (true) {          //
                 try {
                     for(Class<?> clazz : inst.getAllLoadedClasses()){
                         if (clazz.getName().equals("TestTransformer")) {
+                            // 使用 retransformClasses 配合我们的 Transformer 进行转换字节码，同样的我们有下面的这个类
                             inst.retransformClasses(clazz);
                         }
                     }
@@ -61,6 +66,7 @@ public class TestAgentBootstrap {
                         while (true) {
                             ClassDefinition classDefinition = new ClassDefinition(clazz, getIndexBytes(index, bytess));
                             // redefindeClass Test1
+                            // 使用redefineClasses 直接将字节码做了交换，导致原始字节码丢失，局限较大。
                             inst.redefineClasses(classDefinition);
                             Thread.sleep(100L);
                             index++;
